@@ -32,9 +32,8 @@ void Database::loadTable(const Table_id&& table_id, QTableWidget* tableWidget)
     case employee:
     {
         tableWidget->setRowCount(Database::countTable(move(table_id)));
-        //тут, правильнее было бы, еще и указать кол-во столбцев и дать им название
 
-        query->exec("SELECT p.surname, p.name, p.second_name, x.title, e.phone, e.salary, e.recruitment "
+        query->exec("SELECT p.surname, p.name, p.second_name, p.birthday, p.itn, e.phone, x.title, e.salary, e.recruitment "
                     "FROM Employee AS e "
                     "JOIN Passport AS p "
                             "ON p.itn = e.id_passport "
@@ -43,7 +42,6 @@ void Database::loadTable(const Table_id&& table_id, QTableWidget* tableWidget)
                     );
 
         QString fullname;
-
         for(int row = 0; row < tableWidget->rowCount(); ++row)
         {
             query->next();
@@ -51,12 +49,13 @@ void Database::loadTable(const Table_id&& table_id, QTableWidget* tableWidget)
                              query->value(2).toString().at(0) + ".");
             tableWidget->setItem(row, 0, new QTableWidgetItem(fullname));
             for(int column = 1; column < tableWidget->columnCount(); ++column)
-                tableWidget->setItem(row, column, new QTableWidgetItem(query->value(column+2).toString()));
+                tableWidget->setItem(row, column, new QTableWidgetItem(query->value(column).toString()));
         }
     } break;
     case teamList: break;
     };
 }
+
 
 bool Database::addEmployee(const Employee& employee)
 {
@@ -81,7 +80,27 @@ bool Database::addEmployee(const Employee& employee)
 
     return query->exec();
 }
+void Database::editEmployee(const Employee& employee)
+{
+    unique_ptr<QSqlQuery> query(new QSqlQuery());
 
+    query->prepare("UPDATE Employee SET phone=?, id_post=?, salary=? "
+                   "WHERE id_passport like '" + employee.passport.itn + "' ");
+    query->bindValue(0, employee.phone);
+    query->bindValue(1, employee.id_post);
+    query->bindValue(2, employee.salary);
+
+    query->exec();
+}
+bool Database::removeEmployee(const QString& id_passport)
+{
+    unique_ptr<QSqlQuery> query(new QSqlQuery);
+    query->prepare("DELETE from Employee WHERE id_passport like '" + id_passport + "' "+
+                   "DELETE from Passport WHERE itn like '" + id_passport + "'");
+    if(query->exec())
+        return true;
+    return false;
+}
 int Database::countTable(const Table_id&& table_id)
 {
     unique_ptr<QSqlQuery> query(new QSqlQuery());
@@ -112,10 +131,10 @@ int Database::addPost(const QString&& title)
         return -1;
 }
 
-int Database::id_post(const QString&& title)
+int Database::getPostId(const QString&& title)
 {
     std::unique_ptr<QSqlQuery> query(new QSqlQuery());
-    query->exec(QString("SELECT id FROM EmployeePost WHERE title = '%1'").arg(title));
+    query->exec("SELECT id FROM EmployeePost WHERE title like '" + title + "'");
 
     if(query->next())
         return query->value(0).toInt();
@@ -123,6 +142,16 @@ int Database::id_post(const QString&& title)
         return -1;
 }
 
+QString Database::getPostName(const int& id_post)
+{
+    std::unique_ptr<QSqlQuery> query(new QSqlQuery());
+    query->exec("SELECT title FROM EmployeePost WHERE id = " + QString::number(id_post));
+
+    if(query->next())
+        return query->value(0).toString();
+    else
+        return "";
+}
 QStringList Database::listPost()
 {
     QStringList listPost;

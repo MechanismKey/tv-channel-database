@@ -8,7 +8,7 @@ class Passport
 {
 public:
     Passport(const QString&& surnameX, const QString&& nameX, const QString&& secondNameX,
-             const QDate&& birthdayX, const int&& itnX);
+             const QDate&& birthdayX, const QString&& itnX);
 
     bool isValid() const;
 
@@ -16,7 +16,7 @@ public:
     QString name;
     QString secondName;
     QDate birthday;
-    int itn;
+    QString itn;
 };
 
 #endif // PASSPORT_H

@@ -13,7 +13,7 @@
 class Database
 {
 public:
-    enum Table_id { schedule, employee, teamList};
+    enum Table_id {schedule, employee, teamList};
 
     Database();
 
@@ -22,7 +22,12 @@ public:
     static bool addEmployee(const Employee& employee);
     static int addPost(const QString&& title);
 
-    static int id_post(const QString&& title);
+    static bool removeEmployee(const QString& id_passport);
+
+    static void editEmployee(const Employee& employee);
+
+    static int getPostId(const QString&& title);
+    static QString getPostName(const int& id_post);
     static QStringList listPost();
 
     static int countTable(const Table_id&& table);

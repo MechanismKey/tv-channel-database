@@ -1,5 +1,5 @@
 #include "employee.h"
-
+#include <QDebug>
 Employee::Employee(Passport& passportX, const QString&& phoneX, const int&& id_postX, const int& salaryX,
                    const QDate&& recruitmentX) :
     passport(passportX), phone(phoneX), id_post(id_postX), salary(salaryX), recruitment(recruitmentX)

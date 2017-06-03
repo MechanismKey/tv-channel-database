@@ -15,10 +15,6 @@
 
 #include <QDebug>
 
-namespace Form
-{
-    enum { Tables, AddEmployee};
-}
 
 namespace Ui {
 class Manager;
@@ -27,6 +23,9 @@ class Manager;
 class Manager : public QWidget
 {
     Q_OBJECT
+
+    enum Form {tables, employee};
+    enum EmployeeMode {add, edit};
 
 public:
     explicit Manager(QWidget *parent = 0);
@@ -37,23 +36,36 @@ private slots:
 
     void on_pushButton_toAddEmployee_clicked();
 
-    void on_pushButton_toEditEmployee_clicked();
-
-    void on_pushButton_backFromAddEmployee_clicked();
-
-    void on_pushButton_addEmployee_clicked();
-
     void on_tableWidget_Employee_cellPressed(int row, int column);
+
+    void on_pushButton_backFromEmployee_clicked();
+
+    void on_pushButton_Employee_clicked();
+
+    void on_pushButton_changeEmployee_clicked();
+
+    void on_pushButton_deleteEmployee_clicked();
 
 private:
     Ui::Manager *ui;
 
-    QSqlTableModel* model;
+    EmployeeMode employee_mode;
 
-    void loadComboPost();
+
     void loadAllTables();
 
+    void loadComboPost();
     int getCurrentPost();
+
+    void editInTableWidgetEmployee(const Employee& employee);
+    void addToTableWidgetEmployee(const Employee& employee);
+    void removeFromTableWidgetEmployee(const QString &itn);
+
+    void clearEmployee();
+    void fillEmployee(const int&& row);
+    void setEmployeeReadOnly(const bool answer);
+    void setEmployeeMode(const EmployeeMode&& mode);
+    void setEmployeeEdit();
 };
 
 #endif // MANAGER_H
